@@ -90,6 +90,9 @@ jobs:
 
           git config user.name  "David"
           git config user.email "MageritX@users.noreply.github.com"
+          # This workflow runs on tags, so actions/checkout leaves a DETACHED HEAD;
+          # attach a local main at that commit before committing/pushing.
+          git checkout -B main
           git add pluginmaster.json
           git diff --cached --quiet || git commit -m "chore: update pluginmaster v$ver [skip ci]"
 
@@ -101,7 +104,7 @@ jobs:
             Write-Host "rebase failed; retrying with merge"
             git pull origin main --no-edit 2>&1 | Out-Host
           }
-          git push
+          git push origin main
 
       - name: Purge jsDelivr cache (CN users)
         shell: pwsh
