@@ -29,10 +29,20 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Download Dalamud Latest
+      - name: Download Dalamud (global + CN dev assemblies)
+        shell: pwsh
         run: |
           Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
           Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+
+          # The CN fork's GatherBuddy.GameData / GatherBuddy.DataImport / GatherBuddy.Levenshtein
+          # projects use Dalamud.CN.NET.Sdk, which resolves the Dalamud installation from
+          # %APPDATA%\XIVLauncherCN\addon\Hooks\dev. The official goatcorp Dalamud does NOT contain
+          # ClientLanguage.ChineseSimplified, so the CN dev assemblies are required as well.
+          # Pinned snapshot (source: XIVLauncherCN's Dalamud dev folder):
+          # https://github.com/MageritX/GatherBuddyReborn/releases/tag/cn-dalamud-dev-15-0-3-4
+          Invoke-WebRequest -Uri https://github.com/MageritX/GatherBuddyReborn/releases/download/cn-dalamud-dev-15-0-3-4/cn-dalamud-dev.zip -OutFile cn-dalamud.zip
+          Expand-Archive -Force cn-dalamud.zip "$env:AppData\XIVLauncherCN\addon\Hooks\dev"
 
       - name: Restore Nuget Packages
         run: dotnet restore Gatherbuddy/Gatherbuddy.csproj
