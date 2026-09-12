@@ -338,6 +338,12 @@ public static class CraftingTasks
                 _materiaNextRetry = DateTime.Now.AddMilliseconds(500);
                 return TaskResult.Retry;
             }
+            if (Dalamud.Conditions[ConditionFlag.Occupied39])
+            {
+                GatherBuddy.Log.Debug("[CraftingTasks] 等待最后的魔晶石精选状态结束 (Occupied39)");
+                _materiaNextRetry = DateTime.Now.AddMilliseconds(200);
+                return TaskResult.Retry;
+            }
             GatherBuddy.Log.Debug("[CraftingTasks] Materia extraction complete");
             _materiaNextRetry = DateTime.MinValue;
             return TaskResult.Done;

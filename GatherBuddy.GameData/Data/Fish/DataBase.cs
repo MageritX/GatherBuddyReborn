@@ -522,7 +522,7 @@ public static partial class Fish
             {
                 w.WriteLine($"        data.Apply({f.ItemId}, Patch.{patch}) // {f.Name.English}");
                 w.WriteLine("            .Bait(data)");
-                w.WriteLine("            .Bite(data, HookSet.Unknown, BiteType.Unknown);");
+                w.WriteLine("            .Bite(data, HookSet.Unknown, BiteType.未知);");
             }
 
             w.WriteLine("    }");

@@ -1147,7 +1147,7 @@ public partial class Interface
                 text += "            .Bait(data)\n";
                 if (missionId is not 0)
                     text += $"            .Mission(data, {missionId})\n";
-                text += "            .Bite(data, HookSet.Unknown, BiteType.Unknown);\n";
+                text += "            .Bite(data, HookSet.Unknown, BiteType.未知);\n";
             }
         }
 

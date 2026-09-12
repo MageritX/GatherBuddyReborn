@@ -606,7 +606,7 @@ public partial class Interface
             => DrawCheckbox("在记录中使用本地时间",
                 "在鱼类记录标签页中显示时间戳时使用本地时间，而非 Unix 时间。",
                 GatherBuddy.Config.UseUnixTimeFishRecords, b => GatherBuddy.Config.UseUnixTimeFishRecords = b);
-        
+
         public static void DrawFishTimerScale()
         {
             var value = GatherBuddy.Config.FishTimerScale / 1000f;
@@ -647,7 +647,7 @@ public partial class Interface
             GatherBuddy.Config.ShowSecondIntervals = newValue;
             GatherBuddy.Config.Save();
         }
-        
+
         public static void DrawFishTimerIntervalsRounding()
         {
             var value = GatherBuddy.Config.SecondIntervalsRounding;
@@ -666,6 +666,23 @@ public partial class Interface
             GatherBuddy.Config.Save();
         }
 
+        public static void DrawUpcomingUptimesCount()
+        {
+            var value = GatherBuddy.Config.UpcomingUptimesCount;
+            ImGui.SetNextItemWidth(SetInputWidth);
+            var ret = ImGui.DragUShort("即将到来的窗口数量", ref value, 0.1f, 1, 20);
+            ImGuiUtil.HoverTooltip("活跃时间提示/弹窗中显示的即将到来的采集窗口数量。");
+            if (!ret)
+                return;
+
+            var newValue = Math.Clamp(value, (ushort)1, (ushort)100);
+            if (newValue == GatherBuddy.Config.UpcomingUptimesCount)
+                return;
+
+            GatherBuddy.Config.UpcomingUptimesCount = newValue;
+            GatherBuddy.Config.Save();
+        }
+
         public static void DrawHideFishPopupBox()
             => DrawCheckbox("隐藏捕获弹窗",
                 "阻止显示展示捕获鱼及其尺寸、数量和品质的弹窗。",
@@ -680,29 +697,34 @@ public partial class Interface
             => DrawCheckbox("显示多重提钩提示",
                 "显示鱼类在宇宙探索和海钓中是否可双提或三提",
                 GatherBuddy.Config.ShowMultiHookHints, b => GatherBuddy.Config.ShowMultiHookHints = b);
+
         public static void DrawOceanTypeHintPopupBox()
             => DrawCheckbox("显示海钓类型提示",
                 "在海钓中显示鱼类类型",
                 GatherBuddy.Config.ShowOceanTypeHints, b => GatherBuddy.Config.ShowOceanTypeHints = b);
-        
+
         // Fish Stats Window
         public static void DrawEnableFishStats()
             => DrawCheckbox("启用鱼类统计",
                 "新增标签页，基于本地记录汇总和报告鱼类统计数据。当前处于测试阶段。",
                 GatherBuddy.Config.EnableFishStats, b => GatherBuddy.Config.EnableFishStats = b);
-        public static void DrawEnableReportTime()  
+
+        public static void DrawEnableReportTime()
             => DrawCheckbox("报告时复制时间统计",
                 "复制报告时，将最短和最长时间添加到报告中。",
                 GatherBuddy.Config.EnableReportTime, b => GatherBuddy.Config.EnableReportTime = b);
-        public static void DrawEnableReportSize()  
+
+        public static void DrawEnableReportSize()
             => DrawCheckbox("报告时复制尺寸统计",
                 "复制报告时，将最小和最大尺寸添加到报告中。",
                 GatherBuddy.Config.EnableReportSize, b => GatherBuddy.Config.EnableReportSize = b);
-        public static void DrawEnableReportMulti() 
+
+        public static void DrawEnableReportMulti()
             => DrawCheckbox("报告时复制多重提钩统计",
                 "复制报告时，将多重提钩产出统计添加到报告中。",
                 GatherBuddy.Config.EnableReportMulti, b => GatherBuddy.Config.EnableReportMulti = b);
-        public static void DrawEnableGraphs()      
+
+        public static void DrawEnableGraphs()
             => DrawCheckbox("启用图表",
                 "查看渔场时，启用鱼类报告数据的可视化。极度测试阶段！",
                 GatherBuddy.Config.EnableFishStatsGraphs, b => GatherBuddy.Config.EnableFishStatsGraphs = b);
@@ -1582,6 +1604,7 @@ public partial class Interface
             new("显示状态行",                               ConfigFunctions.DrawShowStatusLineBox),
             new("隐藏 GatherClippy 按钮",                       ConfigFunctions.DrawHideClippyBox),
             new("打开主界面的热键",                  ConfigFunctions.DrawMainInterfaceHotkeyInput),
+            new("即将到来的窗口数量",                 ConfigFunctions.DrawUpcomingUptimesCount),
         ]),
         new("界面", "钓鱼计时器",
         [

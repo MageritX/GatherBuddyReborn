@@ -367,6 +367,14 @@ internal unsafe class RetainerTaskExecutor
             return CraftingTasks.TaskResult.Retry;
         }
 
+        if (GenericHelpers.TryGetAddonByName<AddonTalk>("Talk", out var talk) && talk->AtkUnitBase.IsVisible)
+        {
+            GatherBuddy.Log.Debug("[RetainerTaskExecutor] 在打开雇员菜单前关闭对话窗口");
+            new AddonMaster.Talk((nint)talk).Click();
+            Delay(300);
+            return CraftingTasks.TaskResult.Retry;
+        }
+
         _addonRetryCount++;
         if (_addonRetryCount > MaxAddonRetries)
         {
