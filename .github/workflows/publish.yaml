@@ -71,3 +71,41 @@ jobs:
         with:
           files: ./build/GatherbuddyReborn.zip
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update pluginmaster.json
+        shell: pwsh
+        run: |
+          $ts  = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+          $ver = "${{ env.tag }}"
+          $dl  = "https://github.com/MageritX/GatherBuddyReborn/releases/download/$ver/GatherbuddyReborn.zip"
+          $json = @(Get-Content pluginmaster.json -Raw -Encoding UTF8 | ConvertFrom-Json)
+          $json[0].AssemblyVersion     = $ver
+          $json[0].LastUpdated         = $ts
+          $json[0].DownloadLinkInstall = $dl
+          $json[0].DownloadLinkTesting = $dl
+          $json[0].DownloadLinkUpdate  = $dl
+          # UTF-8 without BOM: the file carries Chinese metadata and Dalamud parses it strictly
+          $out = $json | ConvertTo-Json -Depth 10 -AsArray
+          [System.IO.File]::WriteAllText((Join-Path $PWD "pluginmaster.json"), $out, (New-Object System.Text.UTF8Encoding($false)))
+
+          git config user.name  "David"
+          git config user.email "MageritX@users.noreply.github.com"
+          git add pluginmaster.json
+          git diff --cached --quiet || git commit -m "chore: update pluginmaster v$ver [skip ci]"
+
+          # Rebase onto latest remote before pushing; two CI runs can race on main.
+          # On conflict (pluginmaster.json timestamp churn) prefer our freshly written version.
+          git pull --rebase origin main -X theirs 2>&1 | Out-Host
+          if ($LASTEXITCODE -ne 0) {
+            git rebase --abort
+            Write-Host "rebase failed; retrying with merge"
+            git pull origin main --no-edit 2>&1 | Out-Host
+          }
+          git push
+
+      - name: Purge jsDelivr cache (CN users)
+        shell: pwsh
+        run: |
+          # jsDelivr caches GitHub files; purge so 卫月/Dalamud fetches the fresh pluginmaster
+          try { Invoke-WebRequest "https://purge.jsdelivr.net/gh/MageritX/GatherBuddyReborn@main/pluginmaster.json" -UseBasicParsing | Out-Null; Write-Host "jsDelivr cache purged" }
+          catch { Write-Host "jsDelivr purge failed (non-fatal): $_" }
